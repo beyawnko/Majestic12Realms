@@ -12,7 +12,7 @@ Features:
   
   -Dynamic day-night cycle, survival elements (changes to player status like food and water, stamina regen, and mana effects are all intertwined.)
   
-  -Crafting and building mechanics ("Fortnite" style central hub based building currently, but looking to refine and adapt to more suitable methods.)
+  -Crafting (ammo+survival items) and building mechanics ("Fortnite" style central hub based building currently, but looking to refine and adapt to more suitable methods.)
   
   -Multiplayer support (fully replicated currently.)
   
