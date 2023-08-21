@@ -9,12 +9,17 @@ This project is an enterprising attempt to create a Minecraft-esque game using U
 Features
 
   -Voxel-based terrain generation
+  
   -Dynamic day-night cycle, survival elements
+  
   -Crafting and building mechanics
+  
   -Multiplayer support
+  
   -VRM-based player creation: Customize your avatar using the VRM standard, ensuring a unique and personalized gaming experience.
   Isekai RPG Elements: Dive into a rich storyline, complete quests, and interact with unique characters in a world inspired by popular   Isekai manga that incorporates community world building for unique gameplay.
-  -Advanced AI driven innovation for NPCs, and content generation (diagloge, and economic interactions initially planned.)
+  
+  -Advanced AI driven innovation for NPCs, and content generation (diagloge, and economic interactions initially planned), with current localhost LLM experiments currently in progress.
 
 ######To Be Updated######
 
