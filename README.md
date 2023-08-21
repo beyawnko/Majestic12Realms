@@ -20,7 +20,7 @@ Features:
   
   -Isekai RPG Elements: Dive into a rich storyline, complete quests, and interact with unique characters in a world inspired by popular   Isekai manga that incorporates community world building for unique gameplay.
   
-  -Advanced AI driven innovation for NPCs, and content generation (diagloge, and economic interactions initially planned), with current localhost LLM experiments currently in progress.
+  -Advanced AI driven innovation for NPCs, and content generation (diagloge, and economic interactions initially planned), with localhost LLM experiments currently in progress.
 
 ######To Be Updated######
 
