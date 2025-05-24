@@ -36,6 +36,7 @@ public class MJ12DevPluginModule : ModuleRules
                 "Engine",
                 "Slate",
                 "SlateCore",
+                "GameplayTags", // Added GameplayTags
                 // ... add private dependencies here ...
             }
             );

@@ -1,5 +1,7 @@
 #include "MJ12DevPluginModule.h"
 
+DEFINE_LOG_CATEGORY(LogMJ12DevPlugin);
+
 #define LOCTEXT_NAMESPACE "FMJ12DevPluginModule"
 
 void FMJ12DevPluginModule::StartupModule()
