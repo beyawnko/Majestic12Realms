@@ -46,6 +46,7 @@ git clone https://github.com/beyawnko/Majestik12Realms.git
 cd Majestik12Realms
 ```
 
+0. Merge addional assets/GitHub content with default ESRPGv5 base project from Marketplace.
 1. Open `.uproject` in UE5.5+
 2. Let Unreal rebuild modules (if required)
 3. Configure ESRPGv5 via `BP_GameInstance`, `BP_PlayerManagerComponent`, and other core Blueprints.
