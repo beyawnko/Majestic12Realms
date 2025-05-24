@@ -35,6 +35,7 @@ This project leverages [Easy Survival RPG v5 (ESRPGv5)] for advanced multiplayer
 
 ### Prerequisites
 - Unreal Engine 5.5+
+- ESRPGv5 Project from Fab Marketplace
 - Visual Studio 2022 with UE integrations
 - ESRPGv5 Template (licensed and imported)
 - Optional: LuaMachine Plugin for in-game scriptable ritual logic
