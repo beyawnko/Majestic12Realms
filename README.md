@@ -1,43 +1,116 @@
-“Majestic12Realms”
+# Majestik: 12 Realms
 
-Minecraft-Inspired Unreal Engine (UE 5.2) Project with VRM metaverse & Isekai RPG Story Elements
+**A narrative-rich, esoteric isekai RPG adventure built in Unreal Engine 5.5+ powered by ESRPG v5.**
 
-Description
+---
 
-This project is an enterprising attempt to create a Minecraft-esque game using Unreal Engine 5.2+, enhanced with VRM-based player creation (via Vroid Studio in Demo) and presenting strong Isekai RPG elements for an immersive story. Drawing inspiration from the blocky world of Minecraft and the captivating common narratives of popular Isekai manga/anime, this project aims to combine the best of voxel-based sandbox gameplay with immersive RPG storytelling and the power of Unreal Engine. As of right now, this project is mainly done in Blueprints, with supporting elements in C++, for current iterative builds - as I am presently solodev for my studio. Will be incorporating Verse and C++ where applicable in the future. Features are heavily based on Mordern RPG template from Unreal Marketplace, with custom coding and blueprints for a magic system, magic independent leveling system, spellbook with UI (data table driven), survival aspects (dynamic health/stamina/mana directly tied to player status and skills), as well as basic VFX/Animation/SFX for basic elemental spells. Use of Endless Worlds plugin or Voxel procedural generation tools are next for implementaion. I am open to turning this into a group or community project if beneficial.
+## Overview
 
-Features:
+*Majestik: 12 Realms* is a surreal, mystical journey where players embody a "Starchild"—a cosmic outsider drawn into a realm governed by metaphysical principles and powerful archetypes. Traverse twelve unique Realms, each representing a facet of consciousness and universal truths, and uncover the secrets of the Architects, the Twin Moons Lux and Nox, and the enigmatic prophecy of Ascension.
 
-  -Voxel-based terrain generation
-  
-  -Dynamic day-night cycle, survival elements (changes to player status like food and water, stamina regen, and mana effects are all intertwined.)
-  
-  -Crafting (ammo+survival items) and building mechanics ("Fortnite" style central hub based building currently, but looking to refine and adapt to more suitable methods.)
-  
-  -Multiplayer support (fully replicated currently.)
-  
-  -VRM-based player creation: Customize your avatar using the VRM standard, ensuring a unique and personalized gaming experience.
-  
-  -Isekai RPG Elements: Dive into a rich storyline, complete quests, and interact with unique characters in a world inspired by popular   Isekai manga that incorporates community world building for unique gameplay.
-  
-  -Advanced AI driven innovation for NPCs, and content generation (diagloge, and economic interactions initially planned), with localhost LLM experiments currently in progress.
+This project leverages [Easy Survival RPG v5 (ESRPGv5)] for advanced multiplayer RPG systems and includes custom extensions for lore, esoteric gameplay, procedural systems, and isekai manga/anime inspired stylized interaction mechanics. All technical docs will be for internal usage only, GitHub is only for code.
 
-######To Be Updated######
+---
 
-Installation
+## Features
 
-1. Clone the repository:
-2. Open the project in Unreal Engine.
-3. Build and run the game.
+### Core Systems (Powered by ESRPGv5)
+- Multiplayer survival RPG foundation
+- Inventory, crafting, quests, and dialogue systems
+- Fully replicated building and container systems
+- Attributes, status effects, and advanced combat
+- Modular skill tree, abilities, and spell book
 
-## Contribution
+### Majestik Extensions
+- Authentic Path System: Deep choice-based narrative and consequence system
+- Psyche Meter: Mental state system affecting world perception and abilities
+- Esoteric Practices: Rituals, glyphs, and incantations as game mechanics
+- Cosmic Lore Engine: Dynamic NPC lore propagation and mystery unraveling
+- 12 Unique Realms: Each with its own biome, challenges, Guardian, and philosophical theme
+- Fractal Labyrinth: Rogue-lite subconscious dungeons linked to personal growth
 
-Contributions are welcome! Please fork the repository and create a pull request with your changes.
+---
+
+## Getting Started
+
+### Prerequisites
+- Unreal Engine 5.5+
+- Visual Studio 2022 with UE integrations
+- ESRPGv5 Template (licensed and imported)
+- Optional: LuaMachine Plugin for in-game scriptable ritual logic
+
+### Installation
+
+```bash
+git clone https://github.com/beyawnko/Majestik12Realms.git
+cd Majestik12Realms
+```
+
+0. Merge addional assets/GitHub content with default ESRPGv5 base project from Marketplace.
+1. Open `.uproject` in UE5.5+
+2. Let Unreal rebuild modules (if required)
+3. Configure ESRPGv5 via `BP_GameInstance`, `BP_PlayerManagerComponent`, and other core Blueprints.
+4. Enable World Partition, Data Layers, and Chaos for best performance and streaming.
+
+---
+
+## Realms of Majestik
+
+| Realm | Theme | Guardian |
+|-------|-------|----------|
+| Boundless Expanse | Infinity & Cosmic Truths | Aethyric Serpent |
+| Flame Eternal | Rebirth & Renewal | Phoenix |
+| Crowned Victor's Domain | Power & Sovereignty | Lion |
+| Whisperer's Labyrinth | Secrets & Duality | Wyrm |
+| Crimson Garden | Desire & Sacrifice | Rose Saint |
+| ... | ... | ... |
+
+Each Realm has custom gameplay mechanics, environmental hazards, and Realm Keys required for progression.
+
+---
+
+## Developer Notes
+
+### Memory Optimization (Block Asset Load from ESRPG default)
+- Use soft references in `DT_Items` to reduce memory bloat.
+- Employ async loading (e.g., `LoadSkeletalMeshAsync`) where possible.
+- Custom asset loader via C++ recommended for larger modular asset sets.
+
+### Strategy Systems (See `ESRPG Dev Tips and Plans.pdf`)
+- LP/Minimax-based AI dynamic behavior
+- Real-time difficulty balancing through dual LP solvers
+- Trading system built as a zero-sum payoff matrix
+
+### Lore System
+- Dynamic quest branching and cosmic mystery logic
+- Faction-based narrative trees (e.g., Order of Eternal Flame vs. Enlightened Order)
+- Thematic consistency rooted in esoteric traditions and metaphysics
+
+---
 
 ## License
 
-This project is licensed under the MIT License.
+This project is a proprietary game system using licensed ESRPGv5 components. Redistribution or commercial use requires appropriate ESRPG license.
 
-## Contact
+---
 
-For any queries or feedback, please reach out to me at beyawnko290@gmail.com.
+## Join the Journey
+
+Embark on a metaphysical odyssey through time, space, and psyche.
+
+> "Balance the Realms, seek the Architects, and let the Twin Moons guide you."
+
+---
+
+## Credits
+
+- Game Design: @beyawnko
+- Narrative Direction: @beyawnko, @LoreWriterSenpai
+- Tech & Optimization: GameDev Senpai Beyawnko
+- ESRPGv5 Template: [Easy Survival RPG on Fab/Unreal Marketplace]
+
+---
+
+## Helpful Documentation
+
+- TBD
