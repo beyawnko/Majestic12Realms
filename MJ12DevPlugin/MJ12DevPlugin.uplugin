@@ -1,0 +1,24 @@
+{
+  "FileVersion": 3,
+  "Version": 1,
+  "VersionName": "0.1",
+  "FriendlyName": "MJ12 Development Plugin",
+  "Description": "A plugin to house common development tools and utilities for MJ12.",
+  "Category": "MJ12",
+  "CreatedBy": "MJ12",
+  "CreatedByURL": "",
+  "DocsURL": "",
+  "MarketplaceURL": "",
+  "SupportURL": "",
+  "CanContainContent": true,
+  "IsBetaVersion": true,
+  "IsExperimentalVersion": false,
+  "Installed": false,
+  "Modules": [
+    {
+      "Name": "MJ12DevPluginModule",
+      "Type": "Runtime",
+      "LoadingPhase": "Default"
+    }
+  ]
+}
