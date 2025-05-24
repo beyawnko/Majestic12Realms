@@ -8,7 +8,7 @@
 
 *Majestik: 12 Realms* is a surreal, mystical journey where players embody a "Starchild"—a cosmic outsider drawn into a realm governed by metaphysical principles and powerful archetypes. Traverse twelve unique Realms, each representing a facet of consciousness and universal truths, and uncover the secrets of the Architects, the Twin Moons Lux and Nox, and the enigmatic prophecy of Ascension.
 
-This project leverages [Easy Survival RPG v5 (ESRPGv5)] for advanced multiplayer RPG systems and includes custom extensions for lore, esoteric gameplay, procedural systems, and stylized interaction mechanics.
+This project leverages [Easy Survival RPG v5 (ESRPGv5)] for advanced multiplayer RPG systems and includes custom extensions for lore, esoteric gameplay, procedural systems, and stylized interaction mechanics. All technical docs will be for internal usage only, GitHub is only for code.
 
 ---
 
