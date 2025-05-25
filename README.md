@@ -135,8 +135,8 @@ The plugin is organized as follows:
     *   `MJ12DevPlugin.uplugin`: The plugin descriptor file.
     *   `Source/`: Contains the plugin's source code.
         *   `MJ12DevPluginModule/`: The primary module for the plugin.
-            *   `Public/`: Public header files. Includes `MJ12DevPluginModule.h` (main module interface) and `MyTestActor.h` (a sample actor).
-            *   `Private/`: Private implementation files. Includes `MJ12DevPluginModule.cpp` and `MyTestActor.cpp`.
+            *   `Public/`: Public header files. Includes `MJ12DevPluginModule.h` (main module interface), `ItemTableRow.h`, `ItemData.h`, `InventoryComponent.h`, and `EquipmentComponent.h`.
+            *   `Private/`: Private implementation files. Includes `MJ12DevPluginModule.cpp` and `MJ12DevPluginComponents.cpp` (containing implementations for inventory/equipment).
             *   `MJ12DevPluginModule.Build.cs`: The build script for the module.
     *   `Content/`: For any plugin-specific assets (currently empty).
 
@@ -152,4 +152,26 @@ The plugin is organized as follows:
 *   **Editor Modules/Tools:** For editor-specific functionality, you might add a new module of type "Editor" within the `Source` directory and update the `.uplugin` file accordingly.
 *   **Content:** Add any plugin-specific Blueprints, materials, etc., to the `MJ12DevPlugin/Content/` directory.
 
-This plugin serves as a starting point and will be expanded with more specific tools and systems as development progresses.
+This plugin serves as a starting point and is being expanded with core gameplay systems and specific tools.
+
+#### Core Gameplay Systems
+
+The `MJ12DevPlugin` now includes a foundational Inventory and Equipment system:
+
+*   **Item Management:**
+    *   Items are defined in DataTables using the `FItemTableRow` struct (`Source/MJ12DevPluginModule/Public/ItemTableRow.h`).
+    *   Runtime item instances are represented by `UItemData` objects (`Source/MJ12DevPluginModule/Public/ItemData.h`), which support asynchronous loading of associated assets (meshes, icons).
+*   **Inventory Component (`UInventoryComponent`):**
+    *   Located in `Source/MJ12DevPluginModule/Public/InventoryComponent.h`.
+    *   Manages a collection of items (`FInventorySlot`).
+    *   Supports replication for multiplayer.
+    *   Provides delegates (`OnInventorySlotUpdated`, `OnInventoryReloaded`) for UI and game logic to respond to changes.
+    *   Handles asynchronous loading of item data when items are added or replicated.
+*   **Equipment Component (`UEquipmentComponent`):**
+    *   Located in `Source/MJ12DevPluginModule/Public/EquipmentComponent.h`.
+    *   Manages equipped items, using `FGameplayTag` to define equipment slots (e.g., "Equipment.Slot.Weapon").
+    *   Inherits from `UInventoryComponent`, potentially allowing shared inventory space or logic.
+    *   Supports replication and provides a delegate (`OnEquipmentSlotChanged`) for updates.
+    *   Handles asynchronous data loading for equipping items, including a refactored `EquipItemFromInventory` method to correctly manage data dependencies.
+
+These systems provide a robust base for handling items and character equipment within the game.
