@@ -490,8 +490,8 @@ bool UEquipmentComponent::EquipItemFromInventory(FGameplayTag TargetEquipSlotTag
 {
     if (GetOwnerRole() < ROLE_Authority)
     {
-        UE_LOG(LogMJ12DevPlugin, Warning, TEXT("EquipItemFromInventory called on Client. Denied."));
-        return false; 
+        UE_LOG(LogMJ12DevPlugin, Warning, TEXT("EquipItemFromInventory called on Client for %s. Denied."), *GetOwner()->GetName());
+        return false;
     }
 
     if (TargetEquipSlotTag == FGameplayTag::EmptyTag || ItemIDFromInventory == NAME_None)
@@ -500,64 +500,134 @@ bool UEquipmentComponent::EquipItemFromInventory(FGameplayTag TargetEquipSlotTag
         return false;
     }
 
-    FInventorySlot ItemToEquipSlot;
+    FInventorySlot ItemToEquipSlotRecord; // Use a record to pass data to lambda if needed, or capture necessary parts
     int32 ItemSlotIndex = -1;
-    if (!FindItemSlot(ItemIDFromInventory, ItemToEquipSlot, ItemSlotIndex)) 
+    if (!FindItemSlot(ItemIDFromInventory, ItemToEquipSlotRecord, ItemSlotIndex))
     {
         UE_LOG(LogMJ12DevPlugin, Warning, TEXT("EquipItemFromInventory: Item %s not found in inventory."), *ItemIDFromInventory.ToString());
         return false;
     }
 
-    if (!ItemToEquipSlot.ItemDataInstance)
+    // Define the core equip logic as a callable lambda or nested function
+    // This makes it reusable after ItemData is confirmed loaded.
+    auto PerformEquipLogic = [this, TargetEquipSlotTag, ItemIDFromInventory, ItemSlotIndex](UItemData* LoadedItemData)
     {
-         UE_LOG(LogMJ12DevPlugin, Warning, TEXT("EquipItemFromInventory: ItemData for %s is not loaded yet. Equip might fail or be deferred."), *ItemIDFromInventory.ToString());
-         RequestLoadItemData(ItemIDFromInventory, [this, TargetEquipSlotTag, ItemIDFromInventory, ItemSlotIndex](UItemData* LoadedData){
-            if(LoadedData)
+        if (!LoadedItemData)
+        {
+            UE_LOG(LogMJ12DevPlugin, Warning, TEXT("EquipItemFromInventory: LoadedItemData is null for %s after async load. Cannot equip."), *ItemIDFromInventory.ToString());
+            // Optionally, broadcast a failure event here if needed
+            return; // Explicitly not returning bool from lambda to match TFunction<void(UItemData*)> if RequestLoadItemData expects that for some paths.
+                    // The outer function's bool return indicates initiation.
+        }
+
+        // Ensure the original slot data is up-to-date with the loaded ItemDataInstance
+        // This is crucial because ItemToEquipSlotRecord might be a copy.
+        // We need to work with the actual inventory item or ensure ItemToEquipSlotRecord is what we need.
+        // For simplicity, let's re-fetch or assume the ItemDataInstance in the main inventory array (if applicable)
+        // would be set by RequestLoadItemData's internal workings if it caches.
+        // Given our RequestLoadItemData implementation, it creates a NEW UItemData.
+        // The slot in the main inventory (if this item is from there) would need its ItemDataInstance updated.
+        // The lambda in the original RequestLoadItemData call in AddItem handles associating this.
+        // For EquipItemFromInventory, the ItemToEquipSlotRecord.ItemDataInstance will be null if it wasn't loaded before.
+        // We now have `LoadedItemData`.
+
+        FInventorySlot ActualItemToEquipSlot; // Re-fetch to ensure we have the latest state, especially ItemDataInstance
+        int32 TempSlotIndex = -1; // Temporary for re-fetch
+        if (!FindItemSlot(ItemIDFromInventory, ActualItemToEquipSlot, TempSlotIndex) || TempSlotIndex != ItemSlotIndex)
+        {
+             UE_LOG(LogMJ12DevPlugin, Error, TEXT("EquipItemFromInventory: Item %s disappeared from original slot %d during data load. Aborting."), *ItemIDFromInventory.ToString(), ItemSlotIndex);
+             return;
+        }
+        // Crucially, ensure the ItemDataInstance used for CanEquipItem is the one just loaded.
+        ActualItemToEquipSlot.ItemDataInstance = LoadedItemData;
+
+
+        if (!CanEquipItem(ActualItemToEquipSlot.ItemDataInstance, TargetEquipSlotTag))
+        {
+            // CanEquipItem logs the reason
+            return;
+        }
+
+        // If slot is already occupied, unequip old item first
+        if (EquippedItems.Contains(TargetEquipSlotTag))
+        {
+            FName OldItemID = EquippedItems[TargetEquipSlotTag].ItemID;
+            // Temporarily store the item being unequipped to avoid issues if it's the same item ID being swapped
+            FInventorySlot UnequippedItemDetails = EquippedItems[TargetEquipSlotTag];
+
+            if (!UnequipItem(TargetEquipSlotTag)) // Unequip first
             {
-                if(Inventory.IsValidIndex(ItemSlotIndex) && Inventory[ItemSlotIndex].ItemID == ItemIDFromInventory)
+                UE_LOG(LogMJ12DevPlugin, Warning, TEXT("EquipItemFromInventory: Failed to unequip previous item from slot %s."), *TargetEquipSlotTag.ToString());
+                // If UnequipItem failed to add back to inventory, and we add it back now, ensure it does not interfere with the item being equipped.
+                // This part of logic can get complex if inventory space is an issue. AddItem has its own checks.
+                return; // Failed to unequip, cannot proceed
+            }
+            UE_LOG(LogMJ12DevPlugin, Log, TEXT("EquipItemFromInventory: Unequipped %s to make space for %s in slot %s."), *OldItemID.ToString(), *ItemIDFromInventory.ToString(), *TargetEquipSlotTag.ToString());
+        }
+
+        // Create the equipped item slot (typically quantity 1 for equipment)
+        FInventorySlot EquippedSlot(ItemIDFromInventory, 1);
+        EquippedSlot.ItemDataInstance = ActualItemToEquipSlot.ItemDataInstance; // Use the loaded ItemData
+
+        // Remove one instance from inventory BEFORE adding to equipped map
+        // to handle cases where inventory is full and unequip->additem fails.
+        if (!RemoveItem(ItemIDFromInventory, 1)) // Use base RemoveItem
+        {
+            UE_LOG(LogMJ12DevPlugin, Error, TEXT("EquipItemFromInventory: Failed to remove item %s from inventory for equip! Aborting equip."), *ItemIDFromInventory.ToString());
+            // If the item we just unequipped needs to be restored to the slot, this logic would be more complex.
+            // For now, assume failure to remove from inventory means we cannot proceed with equipping.
+            // Consider if the previously unequipped item needs to be re-equipped or if its AddItem in UnequipItem was successful.
+            return;
+        }
+
+        EquippedItems.Add(TargetEquipSlotTag, EquippedSlot);
+        UE_LOG(LogMJ12DevPlugin, Log, TEXT("EquipItemFromInventory: Item %s equipped to slot %s."), *ItemIDFromInventory.ToString(), *TargetEquipSlotTag.ToString());
+
+        if (GetNetMode() == NM_ListenServer || GetNetMode() == NM_DedicatedServer)
+        {
+            OnRep_EquippedItems();
+        }
+        else if (GetNetMode() == NM_Standalone)
+        {
+            OnEquipmentSlotChanged.Broadcast(TargetEquipSlotTag, &EquippedItems[TargetEquipSlotTag]);
+        }
+    };
+
+    // If ItemData is already loaded in the slot from inventory, use it directly.
+    if (ItemToEquipSlotRecord.ItemDataInstance && ItemToEquipSlotRecord.ItemDataInstance->AreAssetsLoaded())
+    {
+        UE_LOG(LogMJ12DevPlugin, Log, TEXT("EquipItemFromInventory: ItemData for %s already loaded. Proceeding synchronously."), *ItemIDFromInventory.ToString());
+        PerformEquipLogic(ItemToEquipSlotRecord.ItemDataInstance);
+    }
+    else // ItemData not loaded or assets not ready, request load.
+    {
+        UE_LOG(LogMJ12DevPlugin, Log, TEXT("EquipItemFromInventory: ItemData for %s not loaded or assets pending. Requesting async load."), *ItemIDFromInventory.ToString());
+        // Pass the ItemSlotIndex to ensure we can update the correct FInventorySlot's ItemDataInstance
+        // The lambda passed to RequestLoadItemData in UInventoryComponent already handles setting ItemDataInstance for a given slot index.
+        // We need to ensure that the 'ItemToEquipSlotRecord' gets its ItemDataInstance updated if it's a copy,
+        // or that PerformEquipLogic uses the correctly updated instance from the main Inventory array.
+        // The RequestLoadItemData in InventoryComponent updates the FInventorySlot in its Inventory TArray.
+        // So, PerformEquipLogic should ideally re-fetch the FInventorySlot or be passed the ItemData directly.
+        // The ItemSlotIndex is captured by PerformEquipLogic to potentially re-verify.
+
+        RequestLoadItemData(ItemIDFromInventory, [this, PerformEquipLogic, ItemSlotIndex, ItemIDFromInventory](UItemData* LoadedData) {
+            // After data is loaded (or load failed) by the base RequestLoadItemData:
+            if (LoadedData)
+            {
+                 // If the item still exists in the original inventory slot, ensure its ItemDataInstance is updated.
+                 // This is a bit redundant if RequestLoadItemData's callback (HandleItemDataLoaded) already did this,
+                 // but double-checking doesn't hurt, or rely on FindItemSlot inside PerformEquipLogic.
+                if (Inventory.IsValidIndex(ItemSlotIndex) && Inventory[ItemSlotIndex].ItemID == ItemIDFromInventory)
                 {
                     Inventory[ItemSlotIndex].ItemDataInstance = LoadedData;
-                    UE_LOG(LogMJ12DevPlugin, Log, TEXT("ItemData loaded for %s, re-attempting equip logic conceptually."), *ItemIDFromInventory.ToString());
                 }
             }
-         });
+            // Now call the core equip logic with the loaded data (which might be null if load failed)
+            PerformEquipLogic(LoadedData);
+        });
     }
 
-    if (!CanEquipItem(ItemToEquipSlot.ItemDataInstance, TargetEquipSlotTag))
-    {
-        return false;
-    }
-
-    if (EquippedItems.Contains(TargetEquipSlotTag))
-    {
-        FName OldItemID = EquippedItems[TargetEquipSlotTag].ItemID;
-        if (!UnequipItem(TargetEquipSlotTag)) 
-        {
-             UE_LOG(LogMJ12DevPlugin, Warning, TEXT("EquipItemFromInventory: Failed to unequip previous item from slot %s."), *TargetEquipSlotTag.ToString());
-            return false; 
-        }
-        UE_LOG(LogMJ12DevPlugin, Log, TEXT("EquipItemFromInventory: Unequipped %s to make space for %s in slot %s."), *OldItemID.ToString(), *ItemIDFromInventory.ToString(), *TargetEquipSlotTag.ToString());
-    }
-
-    FInventorySlot EquippedSlot(ItemIDFromInventory, 1); 
-    EquippedSlot.ItemDataInstance = ItemToEquipSlot.ItemDataInstance; 
-
-    EquippedItems.Add(TargetEquipSlotTag, EquippedSlot);
-
-    if (!RemoveItem(ItemIDFromInventory, 1)) 
-    {
-        UE_LOG(LogMJ12DevPlugin, Error, TEXT("EquipItemFromInventory: Failed to remove item %s from inventory after reserving for equip! Reverting equip."), *ItemIDFromInventory.ToString());
-        EquippedItems.Remove(TargetEquipSlotTag); 
-        if (GetNetMode() == NM_ListenServer || GetNetMode() == NM_DedicatedServer) OnRep_EquippedItems();
-        return false;
-    }
-
-    UE_LOG(LogMJ12DevPlugin, Log, TEXT("EquipItemFromInventory: Item %s equipped to slot %s."), *ItemIDFromInventory.ToString(), *TargetEquipSlotTag.ToString());
-
-    if (GetNetMode() == NM_ListenServer || GetNetMode() == NM_DedicatedServer) OnRep_EquippedItems();
-    else if (GetNetMode() == NM_Standalone) OnEquipmentSlotChanged.Broadcast(TargetEquipSlotTag, &EquippedItems[TargetEquipSlotTag]);
-
-    return true;
+    return true; // Indicates the equip process has been initiated. Actual success is asynchronous.
 }
 
 bool UEquipmentComponent::EquipItemByCreatingInstance(FGameplayTag TargetEquipSlotTag, FName ItemIDToCreateAndEquip)
