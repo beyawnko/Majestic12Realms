@@ -91,9 +91,6 @@ protected:
     UDataTable* ItemDataTable;
 
 private:
-    // Helper to find an existing stackable slot or an empty slot
-    int32 FindAvailableSlotIndex(FName ItemID, const UItemData* ItemDataDefinition) const;
-
     // Manages active async load requests for ItemData assets
     TMap<FName, TSharedPtr<FStreamableHandle>> ActiveLoadHandles;
 

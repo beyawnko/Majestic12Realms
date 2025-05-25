@@ -45,5 +45,4 @@ protected:
 
 private:
     bool CanEquipItem(const UItemData* ItemDataToEquip, FGameplayTag TargetEquipSlotTag) const;
-    void HandleEquippedItemDataLoaded(FGameplayTag SlotTag, UItemData* LoadedData);
 };

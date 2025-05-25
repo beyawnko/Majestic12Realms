@@ -100,7 +100,7 @@ void UInventoryComponent::HandleItemDataLoaded(FName ItemID, UItemData* LoadedDa
 {
     if (!LoadedData)
     {
-        UE_LOG(LogTemp, Warning, TEXT("HandleItemDataLoaded: LoadedData is null for ItemID %s"), *ItemID.ToString());
+        UE_LOG(LogMJ12DevPlugin, Warning, TEXT("HandleItemDataLoaded: LoadedData is null for ItemID %s"), *ItemID.ToString());
         if (bFromOnRep)
         {
             PendingOnRepLoads--;
@@ -145,20 +145,20 @@ bool UInventoryComponent::AddItem(FName ItemID, int32 Quantity)
 {
     if (ItemID == NAME_None || Quantity <= 0)
     {
-        UE_LOG(LogTemp, Warning, TEXT("AddItem: Invalid ItemID or Quantity. ItemID: %s, Quantity: %d"), *ItemID.ToString(), Quantity);
+        UE_LOG(LogMJ12DevPlugin, Warning, TEXT("AddItem: Invalid ItemID or Quantity. ItemID: %s, Quantity: %d"), *ItemID.ToString(), Quantity);
         return false;
     }
 
     if (!ItemDataTable)
     {
-        UE_LOG(LogTemp, Error, TEXT("AddItem: ItemDataTable is not set!"));
+        UE_LOG(LogMJ12DevPlugin, Error, TEXT("AddItem: ItemDataTable is not set!"));
         return false;
     }
 
     FItemTableRow* Row = ItemDataTable->FindRow<FItemTableRow>(ItemID, TEXT("AddItem"));
     if (!Row)
     {
-        UE_LOG(LogTemp, Warning, TEXT("AddItem: ItemID %s not found in ItemDataTable."), *ItemID.ToString());
+        UE_LOG(LogMJ12DevPlugin, Warning, TEXT("AddItem: ItemID %s not found in ItemDataTable."), *ItemID.ToString());
         return false;
     }
 
@@ -216,7 +216,7 @@ bool UInventoryComponent::AddItem(FName ItemID, int32 Quantity)
     }
     else
     {
-         UE_LOG(LogTemp, Warning, TEXT("AddItem called on client for %s. This should typically be a server RPC."), *GetOwner()->GetName());
+         UE_LOG(LogMJ12DevPlugin, Warning, TEXT("AddItem called on client for %s. This should typically be a server RPC."), *GetOwner()->GetName());
          return false; 
     }
 
@@ -228,7 +228,7 @@ bool UInventoryComponent::RemoveItem(FName ItemID, int32 Quantity)
     if (ItemID == NAME_None || Quantity <= 0) return false;
     if (GetOwnerRole() < ROLE_Authority) 
     {
-        UE_LOG(LogTemp, Warning, TEXT("RemoveItem called on client. Denied."));
+        UE_LOG(LogMJ12DevPlugin, Warning, TEXT("RemoveItem called on client. Denied."));
         return false;
     }
 
@@ -270,7 +270,7 @@ bool UInventoryComponent::RemoveItemAt(int32 SlotIndex, int32 Quantity)
     if (!Inventory.IsValidIndex(SlotIndex) || Quantity <= 0) return false;
     if (GetOwnerRole() < ROLE_Authority) 
     {
-         UE_LOG(LogTemp, Warning, TEXT("RemoveItemAt called on client. Denied."));
+         UE_LOG(LogMJ12DevPlugin, Warning, TEXT("RemoveItemAt called on client. Denied."));
         return false;
     }
 
@@ -368,7 +368,7 @@ void UInventoryComponent::RequestLoadItemData(FName ItemID, TFunction<void(UItem
 
     if (!ItemDataTable)
     {
-        UE_LOG(LogTemp, Error, TEXT("RequestLoadItemData: ItemDataTable is not set!"));
+        UE_LOG(LogMJ12DevPlugin, Error, TEXT("RequestLoadItemData: ItemDataTable is not set!"));
         Callback(nullptr);
         return;
     }
@@ -376,7 +376,7 @@ void UInventoryComponent::RequestLoadItemData(FName ItemID, TFunction<void(UItem
     FItemTableRow* Row = ItemDataTable->FindRow<FItemTableRow>(ItemID, TEXT("LoadItemData"));
     if (!Row)
     {
-        UE_LOG(LogTemp, Warning, TEXT("RequestLoadItemData: ItemID %s not found in ItemDataTable."), *ItemID.ToString());
+        UE_LOG(LogMJ12DevPlugin, Warning, TEXT("RequestLoadItemData: ItemID %s not found in ItemDataTable."), *ItemID.ToString());
         Callback(nullptr);
         return;
     }
@@ -419,7 +419,7 @@ void UInventoryComponent::OnAssetsLoaded(UItemData* LoadedItemData, TFunction<vo
     }
     else
     {
-        UE_LOG(LogTemp, Warning, TEXT("OnAssetsLoaded: LoadedItemData for %s became invalid before callback execution."), *ItemID.ToString());
+        UE_LOG(LogMJ12DevPlugin, Warning, TEXT("OnAssetsLoaded: LoadedItemData for %s became invalid before callback execution."), *ItemID.ToString());
         OriginalCallback(nullptr);
     }
 }
@@ -470,13 +470,13 @@ bool UEquipmentComponent::CanEquipItem(const UItemData* ItemDataToEquip, FGamepl
 {
     if (!ItemDataToEquip)
     {
-        UE_LOG(LogTemp, Warning, TEXT("CanEquipItem: ItemDataToEquip is null."));
+        UE_LOG(LogMJ12DevPlugin, Warning, TEXT("CanEquipItem: ItemDataToEquip is null."));
         return false;
     }
 
     if (!ItemDataToEquip->EquipTargetSlotTag.MatchesTag(TargetEquipSlotTag))
     {
-        UE_LOG(LogTemp, Log, TEXT("CanEquipItem: Item %s (targets %s) cannot be equipped in slot %s."),
+        UE_LOG(LogMJ12DevPlugin, Log, TEXT("CanEquipItem: Item %s (targets %s) cannot be equipped in slot %s."),
             *ItemDataToEquip->ItemID.ToString(),
             *ItemDataToEquip->EquipTargetSlotTag.ToString(),
             *TargetEquipSlotTag.ToString());
@@ -490,13 +490,13 @@ bool UEquipmentComponent::EquipItemFromInventory(FGameplayTag TargetEquipSlotTag
 {
     if (GetOwnerRole() < ROLE_Authority)
     {
-        UE_LOG(LogTemp, Warning, TEXT("EquipItemFromInventory called on Client. Denied."));
+        UE_LOG(LogMJ12DevPlugin, Warning, TEXT("EquipItemFromInventory called on Client. Denied."));
         return false; 
     }
 
     if (TargetEquipSlotTag == FGameplayTag::EmptyTag || ItemIDFromInventory == NAME_None)
     {
-        UE_LOG(LogTemp, Warning, TEXT("EquipItemFromInventory: Invalid TargetEquipSlotTag or ItemIDFromInventory."));
+        UE_LOG(LogMJ12DevPlugin, Warning, TEXT("EquipItemFromInventory: Invalid TargetEquipSlotTag or ItemIDFromInventory."));
         return false;
     }
 
@@ -504,20 +504,20 @@ bool UEquipmentComponent::EquipItemFromInventory(FGameplayTag TargetEquipSlotTag
     int32 ItemSlotIndex = -1;
     if (!FindItemSlot(ItemIDFromInventory, ItemToEquipSlot, ItemSlotIndex)) 
     {
-        UE_LOG(LogTemp, Warning, TEXT("EquipItemFromInventory: Item %s not found in inventory."), *ItemIDFromInventory.ToString());
+        UE_LOG(LogMJ12DevPlugin, Warning, TEXT("EquipItemFromInventory: Item %s not found in inventory."), *ItemIDFromInventory.ToString());
         return false;
     }
 
     if (!ItemToEquipSlot.ItemDataInstance)
     {
-         UE_LOG(LogTemp, Warning, TEXT("EquipItemFromInventory: ItemData for %s is not loaded yet. Equip might fail or be deferred."), *ItemIDFromInventory.ToString());
+         UE_LOG(LogMJ12DevPlugin, Warning, TEXT("EquipItemFromInventory: ItemData for %s is not loaded yet. Equip might fail or be deferred."), *ItemIDFromInventory.ToString());
          RequestLoadItemData(ItemIDFromInventory, [this, TargetEquipSlotTag, ItemIDFromInventory, ItemSlotIndex](UItemData* LoadedData){
             if(LoadedData)
             {
                 if(Inventory.IsValidIndex(ItemSlotIndex) && Inventory[ItemSlotIndex].ItemID == ItemIDFromInventory)
                 {
                     Inventory[ItemSlotIndex].ItemDataInstance = LoadedData;
-                    UE_LOG(LogTemp, Log, TEXT("ItemData loaded for %s, re-attempting equip logic conceptually."), *ItemIDFromInventory.ToString());
+                    UE_LOG(LogMJ12DevPlugin, Log, TEXT("ItemData loaded for %s, re-attempting equip logic conceptually."), *ItemIDFromInventory.ToString());
                 }
             }
          });
@@ -533,10 +533,10 @@ bool UEquipmentComponent::EquipItemFromInventory(FGameplayTag TargetEquipSlotTag
         FName OldItemID = EquippedItems[TargetEquipSlotTag].ItemID;
         if (!UnequipItem(TargetEquipSlotTag)) 
         {
-             UE_LOG(LogTemp, Warning, TEXT("EquipItemFromInventory: Failed to unequip previous item from slot %s."), *TargetEquipSlotTag.ToString());
+             UE_LOG(LogMJ12DevPlugin, Warning, TEXT("EquipItemFromInventory: Failed to unequip previous item from slot %s."), *TargetEquipSlotTag.ToString());
             return false; 
         }
-        UE_LOG(LogTemp, Log, TEXT("EquipItemFromInventory: Unequipped %s to make space for %s in slot %s."), *OldItemID.ToString(), *ItemIDFromInventory.ToString(), *TargetEquipSlotTag.ToString());
+        UE_LOG(LogMJ12DevPlugin, Log, TEXT("EquipItemFromInventory: Unequipped %s to make space for %s in slot %s."), *OldItemID.ToString(), *ItemIDFromInventory.ToString(), *TargetEquipSlotTag.ToString());
     }
 
     FInventorySlot EquippedSlot(ItemIDFromInventory, 1); 
@@ -546,13 +546,13 @@ bool UEquipmentComponent::EquipItemFromInventory(FGameplayTag TargetEquipSlotTag
 
     if (!RemoveItem(ItemIDFromInventory, 1)) 
     {
-        UE_LOG(LogTemp, Error, TEXT("EquipItemFromInventory: Failed to remove item %s from inventory after reserving for equip! Reverting equip."), *ItemIDFromInventory.ToString());
+        UE_LOG(LogMJ12DevPlugin, Error, TEXT("EquipItemFromInventory: Failed to remove item %s from inventory after reserving for equip! Reverting equip."), *ItemIDFromInventory.ToString());
         EquippedItems.Remove(TargetEquipSlotTag); 
         if (GetNetMode() == NM_ListenServer || GetNetMode() == NM_DedicatedServer) OnRep_EquippedItems();
         return false;
     }
 
-    UE_LOG(LogTemp, Log, TEXT("EquipItemFromInventory: Item %s equipped to slot %s."), *ItemIDFromInventory.ToString(), *TargetEquipSlotTag.ToString());
+    UE_LOG(LogMJ12DevPlugin, Log, TEXT("EquipItemFromInventory: Item %s equipped to slot %s."), *ItemIDFromInventory.ToString(), *TargetEquipSlotTag.ToString());
 
     if (GetNetMode() == NM_ListenServer || GetNetMode() == NM_DedicatedServer) OnRep_EquippedItems();
     else if (GetNetMode() == NM_Standalone) OnEquipmentSlotChanged.Broadcast(TargetEquipSlotTag, &EquippedItems[TargetEquipSlotTag]);
@@ -564,7 +564,7 @@ bool UEquipmentComponent::EquipItemByCreatingInstance(FGameplayTag TargetEquipSl
 {
     if (GetOwnerRole() < ROLE_Authority)
     {
-        UE_LOG(LogTemp, Warning, TEXT("EquipItemByCreatingInstance called on Client. Denied."));
+        UE_LOG(LogMJ12DevPlugin, Warning, TEXT("EquipItemByCreatingInstance called on Client. Denied."));
         return false;
     }
 
@@ -573,7 +573,7 @@ bool UEquipmentComponent::EquipItemByCreatingInstance(FGameplayTag TargetEquipSl
     RequestLoadItemData(ItemIDToCreateAndEquip, [this, TargetEquipSlotTag, ItemIDToCreateAndEquip](UItemData* LoadedItemData){
         if (!LoadedItemData)
         {
-            UE_LOG(LogTemp, Warning, TEXT("EquipItemByCreatingInstance: Could not load ItemData for %s."), *ItemIDToCreateAndEquip.ToString());
+            UE_LOG(LogMJ12DevPlugin, Warning, TEXT("EquipItemByCreatingInstance: Could not load ItemData for %s."), *ItemIDToCreateAndEquip.ToString());
             return;
         }
 
@@ -586,7 +586,7 @@ bool UEquipmentComponent::EquipItemByCreatingInstance(FGameplayTag TargetEquipSl
         {
             if (!UnequipItem(TargetEquipSlotTag))
             {
-                UE_LOG(LogTemp, Warning, TEXT("EquipItemByCreatingInstance: Failed to unequip previous item from slot %s."), *TargetEquipSlotTag.ToString());
+                UE_LOG(LogMJ12DevPlugin, Warning, TEXT("EquipItemByCreatingInstance: Failed to unequip previous item from slot %s."), *TargetEquipSlotTag.ToString());
                 return;
             }
         }
@@ -595,7 +595,7 @@ bool UEquipmentComponent::EquipItemByCreatingInstance(FGameplayTag TargetEquipSl
         NewEquippedSlot.ItemDataInstance = LoadedItemData;
         EquippedItems.Add(TargetEquipSlotTag, NewEquippedSlot);
 
-        UE_LOG(LogTemp, Log, TEXT("EquipItemByCreatingInstance: Item %s created and equipped to slot %s."), *ItemIDToCreateAndEquip.ToString(), *TargetEquipSlotTag.ToString());
+        UE_LOG(LogMJ12DevPlugin, Log, TEXT("EquipItemByCreatingInstance: Item %s created and equipped to slot %s."), *ItemIDToCreateAndEquip.ToString(), *TargetEquipSlotTag.ToString());
 
         if (GetNetMode() == NM_ListenServer || GetNetMode() == NM_DedicatedServer) OnRep_EquippedItems();
         else if (GetNetMode() == NM_Standalone) OnEquipmentSlotChanged.Broadcast(TargetEquipSlotTag, &EquippedItems[TargetEquipSlotTag]);
@@ -609,13 +609,13 @@ bool UEquipmentComponent::UnequipItem(FGameplayTag EquipSlotTag)
 {
     if (GetOwnerRole() < ROLE_Authority)
     {
-        UE_LOG(LogTemp, Warning, TEXT("UnequipItem called on Client. Denied."));
+        UE_LOG(LogMJ12DevPlugin, Warning, TEXT("UnequipItem called on Client. Denied."));
         return false; 
     }
 
     if (!EquippedItems.Contains(EquipSlotTag))
     {
-        UE_LOG(LogTemp, Warning, TEXT("UnequipItem: No item in slot %s."), *EquipSlotTag.ToString());
+        UE_LOG(LogMJ12DevPlugin, Warning, TEXT("UnequipItem: No item in slot %s."), *EquipSlotTag.ToString());
         return false;
     }
 
@@ -624,10 +624,10 @@ bool UEquipmentComponent::UnequipItem(FGameplayTag EquipSlotTag)
 
     if (!AddItem(UnequippedSlot.ItemID, UnequippedSlot.Quantity)) 
     {
-        UE_LOG(LogTemp, Error, TEXT("UnequipItem: Failed to add item %s back to inventory! Item may be lost if not handled."), *UnequippedSlot.ItemID.ToString());
+        UE_LOG(LogMJ12DevPlugin, Error, TEXT("UnequipItem: Failed to add item %s back to inventory! Item may be lost if not handled."), *UnequippedSlot.ItemID.ToString());
     }
 
-    UE_LOG(LogTemp, Log, TEXT("UnequipItem: Item %s unequipped from slot %s and returned to inventory."), *UnequippedSlot.ItemID.ToString(), *EquipSlotTag.ToString());
+    UE_LOG(LogMJ12DevPlugin, Log, TEXT("UnequipItem: Item %s unequipped from slot %s and returned to inventory."), *UnequippedSlot.ItemID.ToString(), *EquipSlotTag.ToString());
 
     if (GetNetMode() == NM_ListenServer || GetNetMode() == NM_DedicatedServer) OnRep_EquippedItems();
     else if (GetNetMode() == NM_Standalone) OnEquipmentSlotChanged.Broadcast(EquipSlotTag, nullptr);
