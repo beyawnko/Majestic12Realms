@@ -114,3 +114,64 @@ Embark on a metaphysical odyssey through time, space, and psyche.
 ## Helpful Documentation
 
 - TBD
+
+---
+
+## MJ12DevPlugin
+
+This plugin, `MJ12DevPlugin`, is a foundational C++ framework designed to house common development tools, utilities, and custom gameplay systems for the *Majestik: 12 Realms* project.
+
+### Purpose
+
+*   **Centralization:** Provides a central location for custom C++ code, keeping it modular and separate from the main game project or other marketplace assets.
+*   **Rapid Development:** Enables faster iteration on new gameplay mechanics, editor tools, and utility functions.
+*   **Maintainability:** Simplifies updates and management of shared code components.
+
+### Structure
+
+The plugin is organized as follows:
+
+*   `MJ12DevPlugin/` (Root directory)
+    *   `MJ12DevPlugin.uplugin`: The plugin descriptor file.
+    *   `Source/`: Contains the plugin's source code.
+        *   `MJ12DevPluginModule/`: The primary module for the plugin.
+            *   `Public/`: Public header files. Includes `MJ12DevPluginModule.h` (main module interface), `ItemTableRow.h`, `ItemData.h`, `InventoryComponent.h`, and `EquipmentComponent.h`.
+            *   `Private/`: Private implementation files. Includes `MJ12DevPluginModule.cpp` and `MJ12DevPluginComponents.cpp` (containing implementations for inventory/equipment).
+            *   `MJ12DevPluginModule.Build.cs`: The build script for the module.
+    *   `Content/`: For any plugin-specific assets (currently empty).
+
+### Getting Started with the Plugin
+
+1.  **Ensure the plugin is in the project's `Plugins` directory.** If it's not already there (e.g., if cloned separately), copy the `MJ12DevPlugin` folder into your project's `Plugins` folder. Create a `Plugins` folder at the root of your Unreal project if it doesn't exist.
+2.  **Enable the Plugin:** Open your Unreal Engine project, go to `Edit -> Plugins`, search for "MJ12 Development Plugin" (or "MJ12"), and ensure it's enabled. Restart the editor if prompted.
+3.  **Compile:** The plugin code will be compiled automatically when you build your project. If you add new C++ classes to the plugin, you'll need to compile from your IDE (Visual Studio, Rider, etc.) or trigger a build from the Unreal Editor.
+
+### Adding New Functionality
+
+*   **New C++ Classes:** Add new `.h` files to `Source/MJ12DevPluginModule/Public/` and corresponding `.cpp` files to `Source/MJ12DevPluginModule/Private/`.
+*   **Editor Modules/Tools:** For editor-specific functionality, you might add a new module of type "Editor" within the `Source` directory and update the `.uplugin` file accordingly.
+*   **Content:** Add any plugin-specific Blueprints, materials, etc., to the `MJ12DevPlugin/Content/` directory.
+
+This plugin serves as a starting point and is being expanded with core gameplay systems and specific tools.
+
+#### Core Gameplay Systems
+
+The `MJ12DevPlugin` now includes a foundational Inventory and Equipment system:
+
+*   **Item Management:**
+    *   Items are defined in DataTables using the `FItemTableRow` struct (`Source/MJ12DevPluginModule/Public/ItemTableRow.h`).
+    *   Runtime item instances are represented by `UItemData` objects (`Source/MJ12DevPluginModule/Public/ItemData.h`), which support asynchronous loading of associated assets (meshes, icons).
+*   **Inventory Component (`UInventoryComponent`):**
+    *   Located in `Source/MJ12DevPluginModule/Public/InventoryComponent.h`.
+    *   Manages a collection of items (`FInventorySlot`).
+    *   Supports replication for multiplayer.
+    *   Provides delegates (`OnInventorySlotUpdated`, `OnInventoryReloaded`) for UI and game logic to respond to changes.
+    *   Handles asynchronous loading of item data when items are added or replicated.
+*   **Equipment Component (`UEquipmentComponent`):**
+    *   Located in `Source/MJ12DevPluginModule/Public/EquipmentComponent.h`.
+    *   Manages equipped items, using `FGameplayTag` to define equipment slots (e.g., "Equipment.Slot.Weapon").
+    *   Inherits from `UInventoryComponent`, potentially allowing shared inventory space or logic.
+    *   Supports replication and provides a delegate (`OnEquipmentSlotChanged`) for updates.
+    *   Handles asynchronous data loading for equipping items, including a refactored `EquipItemFromInventory` method to correctly manage data dependencies.
+
+These systems provide a robust base for handling items and character equipment within the game.
