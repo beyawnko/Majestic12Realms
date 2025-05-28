@@ -46,11 +46,11 @@ git clone https://github.com/beyawnko/Majestik12Realms.git
 cd Majestik12Realms
 ```
 
-0. Merge addional assets/GitHub content with default ESRPGv5 base project from Marketplace.
+0. Merge addional assets/GitHub content with default base project (obtained after onboarding).
 1. Open `.uproject` in UE5.5+
 2. Let Unreal rebuild modules (if required)
 3. Configure Majestik via `BP_GameInstance`, `BP_PlayerManagerComponent`, and other core Blueprints.
-4. Enable World Partition, Data Layers, and Chaos for best performance and streaming.
+4. Enable World Partition, Nanite, Data Layers, and Chaos for best performance and streaming (constantly changing).
 
 ---
 
@@ -76,7 +76,7 @@ Each Realm has custom gameplay mechanics, environmental hazards, and Realm Keys 
 - Employ async loading (e.g., `LoadSkeletalMeshAsync`) where possible.
 - Custom asset loader via C++ recommended for larger modular asset sets.
 
-### Strategy Systems (See `ESRPG Dev Tips and Plans.pdf`)
+### Strategy Systems (See 'Dev Tips and Plans.pdf`)
 - LP/Minimax-based AI dynamic behavior
 - Real-time difficulty balancing through dual LP solvers
 - Trading system built as a zero-sum payoff matrix
@@ -90,7 +90,7 @@ Each Realm has custom gameplay mechanics, environmental hazards, and Realm Keys 
 
 ## License
 
-This project is a proprietary game system using licensed ESRPGv5 components. Redistribution or commercial use requires appropriate ESRPG license.
+This project is a proprietary game system using licensed components. Redistribution or commercial use requires appropriate license.
 
 ---
 
@@ -107,8 +107,6 @@ Embark on a metaphysical odyssey through time, space, and psyche.
 - Game Design: @beyawnko
 - Narrative Direction: @beyawnko, @LoreWriterSenpai
 - Tech & Optimization: GameDev Senpai Beyawnko
-- ESRPGv5 Template: [Easy Survival RPG on Fab/Unreal Marketplace]
-
 ---
 
 ## Helpful Documentation
