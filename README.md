@@ -1,6 +1,6 @@
 # Majestik: 12 Realms
 
-**A narrative-rich, esoteric isekai RPG adventure built in Unreal Engine 5.5+ powered by ESRPG v5.**
+**A narrative-rich, esoteric isekai RPG adventure built in Unreal Engine 5.5+**
 
 ---
 
@@ -8,13 +8,13 @@
 
 *Majestik: 12 Realms* is a surreal, mystical journey where players embody a "Starchild"—a cosmic outsider drawn into a realm governed by metaphysical principles and powerful archetypes. Traverse twelve unique Realms, each representing a facet of consciousness and universal truths, and uncover the secrets of the Architects, the Twin Moons Lux and Nox, and the enigmatic prophecy of Ascension.
 
-This project leverages [Easy Survival RPG v5 (ESRPGv5)] for advanced multiplayer RPG systems and includes custom extensions for lore, esoteric gameplay, procedural systems, and isekai manga/anime inspired stylized interaction mechanics. All technical docs will be for internal usage only, GitHub is only for code.
+This project leverages advanced multiplayer RPG systems and includes custom extensions for lore, esoteric gameplay, procedural systems, and isekai manga/anime inspired stylized interaction mechanics. All technical docs will be for internal usage only, GitHub is only for code.
 
 ---
 
 ## Features
 
-### Core Systems (Powered by ESRPGv5)
+### Core Systems
 - Multiplayer survival RPG foundation
 - Inventory, crafting, quests, and dialogue systems
 - Fully replicated building and container systems
@@ -36,7 +36,7 @@ This project leverages [Easy Survival RPG v5 (ESRPGv5)] for advanced multiplayer
 ### Prerequisites
 - Unreal Engine 5.5+
 - Visual Studio 2022 with UE integrations
-- ESRPGv5 Template (licensed and imported)
+- Licensed Assets (the actual game files)
 - Optional: LuaMachine Plugin for in-game scriptable ritual logic
 
 ### Installation
@@ -49,7 +49,7 @@ cd Majestik12Realms
 0. Merge addional assets/GitHub content with default ESRPGv5 base project from Marketplace.
 1. Open `.uproject` in UE5.5+
 2. Let Unreal rebuild modules (if required)
-3. Configure ESRPGv5 via `BP_GameInstance`, `BP_PlayerManagerComponent`, and other core Blueprints.
+3. Configure Majestik via `BP_GameInstance`, `BP_PlayerManagerComponent`, and other core Blueprints.
 4. Enable World Partition, Data Layers, and Chaos for best performance and streaming.
 
 ---
